@@ -1,8 +1,11 @@
 package main.src;
 
+import javax.management.StandardMBean;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Stack;
+
+import static java.util.Objects.nonNull;
 
 public class Tabuleiro {
 
@@ -16,8 +19,6 @@ public class Tabuleiro {
 
     private ArrayList<ArrayList<PosicaoTabuleiro>> matriz;
 
-    private int contadorRainhas;
-
 
     public Tabuleiro(int numero_rainhas) {
 
@@ -25,7 +26,6 @@ public class Tabuleiro {
             throw new InvalidParameterException("Numero de rainhas deve ser maior que 1 e menor que 8");
         }
 
-        this.contadorRainhas = 0;
         this.numero_rainhas = numero_rainhas;
         this.pilha = new Stack<>();
         this.matriz = new ArrayList<>();
@@ -38,63 +38,67 @@ public class Tabuleiro {
 
         this.listaRainhas = new ArrayList<>(numero_rainhas);
         for (int i = 0; i < numero_rainhas; i++) {
-            this.listaRainhas.add(new Rainha(i));
+            var rainha = new Rainha(i);
+            this.listaRainhas.add(rainha);
+            this.pilha.push(rainha);
         }
     }
 
-    public boolean alocaRainhas(int coluna, int linha){
+    public int alocaRainhas(int coluna, int linha){
         // se a pilha estiver cheia, retorna true
-        if(this.pilha.size()==numero_rainhas){
-            return true;
+        if(this.pilha.size()==0){
+            return this.numero_rainhas;
         }
-
         // caso a pilha nao esteja cheia, procura a posicao para a proxima rainha;
 
         for (int i = linha; i < TAM_TABULEIRO; i++) {
             for (int j = coluna; j < TAM_TABULEIRO; j++) {
                 if (!this.matriz.get(i).get(j).isEstaOcupado()) {
-                    var rainha = this.listaRainhas.get(this.contadorRainhas++);
-                    rainha.setPosicao(linha,coluna);
-                    this.matriz.get(i).get(j).setRainha(rainha);
-                    this.pilha.push(rainha);
-                    ocupaCampos(rainha);
+                        var rainha = this.pilha.pop();
+                        rainha.setPosicao(i,j);
+                        this.matriz.get(j).get(i).setRainha(rainha);
+                        ocupaCampos(rainha);
+                        return alocaRainhas(i, j+1);
                 }
             }
         }
 
 
-        return true;
+        return this.numero_rainhas - this.pilha.size();
     }
 
     private void ocupaCampos(Rainha rainha) {
         ocupaLinha(rainha.getLinha());
+        System.out.println(print());
         ocupaColuna(rainha.getColuna());
+        System.out.println(print());
         ocupaDiagonal(rainha);
+        System.out.println(print());
     }
 
     private void ocupaDiagonal(Rainha rainha) {
-        for (int i = rainha.getColuna(); i < TAM_TABULEIRO; i++) {
-            for (int j = rainha.getLinha(); j < TAM_TABULEIRO; j++) {
-
-            }
+        int j = rainha.getLinha();
+        for (int i = rainha.getColuna(); i < TAM_TABULEIRO && j < TAM_TABULEIRO; i++) {
+            this.matriz.get(i).get(j).setEstaOcupado(true);
+            j++;
         }
 
-        for (int i = rainha.getColuna(); i < TAM_TABULEIRO; i++) {
-            for (int j = rainha.getLinha(); j > 0; j--) {
-
-            }
+        j = rainha.getLinha();
+        for (int i = rainha.getColuna(); i < TAM_TABULEIRO && j > 0; i++) {
+            this.matriz.get(i).get(j).setEstaOcupado(true);
+            j--;
         }
 
-        for (int i = rainha.getColuna(); i > 0; i--) {
-            for (int j = rainha.getLinha(); j < TAM_TABULEIRO; j++) {
-
-            }
+        j = rainha.getLinha();
+        for (int i = rainha.getColuna(); i > 0 && j < TAM_TABULEIRO; i--) {
+            this.matriz.get(i).get(j).setEstaOcupado(true);
+            j++;
         }
 
-        for (int i = rainha.getColuna(); i > 0 ; i--) {
-            for (int j = rainha.getLinha(); j > 0; j--) {
-
-            }
+        j = rainha.getLinha();
+        for (int i = rainha.getColuna(); i > 0 && j > 0; i--) {
+            this.matriz.get(i).get(j).setEstaOcupado(true);
+            j--;
         }
 
     }
@@ -109,5 +113,21 @@ public class Tabuleiro {
         for (int i = 0; i < TAM_TABULEIRO; i++) {
             this.matriz.get(i).get(linha).setEstaOcupado(true);
         }
+    }
+
+    public String print() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("..........................................").append("\n");
+        for (int i = 0; i < TAM_TABULEIRO; i++) {
+            sb.append("\n");
+            for (int j = 0; j < TAM_TABULEIRO; j++) {
+                sb.append(" | ").append(nonNull(this.matriz.get(j).get(i).getRainha()) ? this.matriz.get(j).get(i).getRainha().getId() : (this.matriz.get(j).get(i).isEstaOcupado()?"*":" "));
+
+            }
+
+        }
+        sb.append("\n...........................................");
+        return sb.toString();
     }
 }

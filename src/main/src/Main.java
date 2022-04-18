@@ -23,7 +23,8 @@ public class Main {
         System.out.println("Digite a quantidade de rainhas desejadas no tabuleiro: ");
         Tabuleiro tabuleiro = new Tabuleiro(scanner.nextInt());
 
-        tabuleiro.alocaRainhas(0,0);
+        System.out.println(tabuleiro.alocaRainhas(0, 0));
+        System.out.println(tabuleiro.print());
     }
 
     private static void setMoedas(int um, int cinco, int dez, int vinteCinco, int cem) {
