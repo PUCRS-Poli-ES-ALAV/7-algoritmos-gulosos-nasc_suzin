@@ -44,25 +44,28 @@ public class Tabuleiro {
         }
     }
 
-    public int alocaRainhas(int coluna, int linha){
+    public int alocaRainhas(int linha_param,int coluna_param){
         // se a pilha estiver cheia, retorna true
         if(this.pilha.size()==0){
             return this.numero_rainhas;
         }
         // caso a pilha nao esteja cheia, procura a posicao para a proxima rainha;
-
-        for (int i = linha; i < TAM_TABULEIRO; i++) {
-            for (int j = coluna; j < TAM_TABULEIRO; j++) {
-                if (!this.matriz.get(i).get(j).isEstaOcupado()) {
+        int col = coluna_param;
+        for (int lin = linha_param; lin < TAM_TABULEIRO; lin++) {
+            for (col = 0; col < TAM_TABULEIRO; col++) {
+                if (!this.matriz.get(lin).get(col).isEstaOcupado()) {
                         var rainha = this.pilha.pop();
-                        rainha.setPosicao(i,j);
-                        this.matriz.get(j).get(i).setRainha(rainha);
+                        rainha.setPosicao(lin,col);
+                        this.matriz.get(lin).get(col).setRainha(rainha);
                         ocupaCampos(rainha);
-                        return alocaRainhas(i, j+1);
+                        return alocaRainhas(lin+1,col);
                 }
             }
         }
 
+        if(!this.pilha.empty()){
+
+        }
 
         return this.numero_rainhas - this.pilha.size();
     }
@@ -77,41 +80,41 @@ public class Tabuleiro {
     }
 
     private void ocupaDiagonal(Rainha rainha) {
-        int j = rainha.getLinha();
-        for (int i = rainha.getColuna(); i < TAM_TABULEIRO && j < TAM_TABULEIRO; i++) {
-            this.matriz.get(i).get(j).setEstaOcupado(true);
-            j++;
+        int linha = rainha.getLinha();
+        for (int coluna = rainha.getColuna(); coluna < TAM_TABULEIRO && linha < TAM_TABULEIRO; coluna++) {
+            this.matriz.get(linha).get(coluna).setEstaOcupado(true);
+            linha++;
         }
 
-        j = rainha.getLinha();
-        for (int i = rainha.getColuna(); i < TAM_TABULEIRO && j > 0; i++) {
-            this.matriz.get(i).get(j).setEstaOcupado(true);
-            j--;
+        linha = rainha.getLinha();
+        for (int coluna = rainha.getColuna(); coluna < TAM_TABULEIRO && linha > 0; coluna++) {
+            this.matriz.get(linha).get(coluna).setEstaOcupado(true);
+            linha--;
         }
 
-        j = rainha.getLinha();
-        for (int i = rainha.getColuna(); i > 0 && j < TAM_TABULEIRO; i--) {
-            this.matriz.get(i).get(j).setEstaOcupado(true);
-            j++;
+        linha = rainha.getLinha();
+        for (int coluna = rainha.getColuna(); coluna > 0 && linha < TAM_TABULEIRO; coluna--) {
+            this.matriz.get(linha).get(coluna).setEstaOcupado(true);
+            linha++;
         }
 
-        j = rainha.getLinha();
-        for (int i = rainha.getColuna(); i > 0 && j > 0; i--) {
-            this.matriz.get(i).get(j).setEstaOcupado(true);
-            j--;
+        linha = rainha.getLinha();
+        for (int coluna = rainha.getColuna(); coluna > 0 && linha > 0; coluna--) {
+            this.matriz.get(linha).get(coluna).setEstaOcupado(true);
+            linha--;
         }
 
     }
 
     private void ocupaColuna(int coluna) {
-        for (int i = 0; i < TAM_TABULEIRO; i++) {
-            this.matriz.get(coluna).get(i).setEstaOcupado(true);
+        for (int linha = 0; linha < TAM_TABULEIRO; linha++) {
+            this.matriz.get(linha).get(coluna).setEstaOcupado(true);
         }
     }
 
     private void ocupaLinha(int linha) {
-        for (int i = 0; i < TAM_TABULEIRO; i++) {
-            this.matriz.get(i).get(linha).setEstaOcupado(true);
+        for (int coluna = 0; coluna < TAM_TABULEIRO; coluna++) {
+            this.matriz.get(linha).get(coluna).setEstaOcupado(true);
         }
     }
 
@@ -119,10 +122,10 @@ public class Tabuleiro {
         StringBuilder sb = new StringBuilder();
 
         sb.append("..........................................").append("\n");
-        for (int i = 0; i < TAM_TABULEIRO; i++) {
+        for (int linha = 0; linha < TAM_TABULEIRO; linha++) {
             sb.append("\n");
-            for (int j = 0; j < TAM_TABULEIRO; j++) {
-                sb.append(" | ").append(nonNull(this.matriz.get(j).get(i).getRainha()) ? this.matriz.get(j).get(i).getRainha().getId() : (this.matriz.get(j).get(i).isEstaOcupado()?"*":" "));
+            for (int coluna = 0; coluna < TAM_TABULEIRO; coluna++) {
+                sb.append(" | ").append(nonNull(this.matriz.get(linha).get(coluna).getRainha()) ? this.matriz.get(linha).get(coluna).getRainha().getId() : (this.matriz.get(linha).get(coluna).isEstaOcupado()?"*":" "));
 
             }
 

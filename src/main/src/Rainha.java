@@ -26,8 +26,8 @@ public class Rainha {
     }
 
     public void setPosicao(int linha, int coluna) {
-        this.coluna = coluna;
         this.linha = linha;
+        this.coluna = coluna;
     }
 
     public int getLinha() {
